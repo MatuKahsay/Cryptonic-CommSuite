@@ -36,3 +36,10 @@ def generate_key(algorithm):
         with open(f'{algorithm}_key.pem', 'wb') as key_file:
             key_file.write(key)
         return key
+    
+def encrypt_file(algorithm, key, input_file_path, output_file_path):
+    with open(input_file_path, 'rb') as file_to_encrypt:
+        message = file_to_encrypt.read()
+        encrypted_message = encrypt_message(algorithm, key, message)
+        with open(output_file_path, 'wb') as encrypted_file:
+            encrypted_file.write(encrypted_message)
