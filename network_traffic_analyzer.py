@@ -84,3 +84,15 @@ def decrypt_message(algorithm, key, encrypted_message):
         # For RSA, the key should be the private key
         decrypted_message = rsa.decrypt(encrypted_message, key).decode()
         return decrypted_message
+    
+def save_key_to_file(key, algorithm, is_private=True):
+    suffix = "private" if is_private else "public"
+    file_name = f"{algorithm}_{suffix}.pem"
+    if algorithm in ['AES', 'Blowfish', 'Fernet']:
+        with open(file_name, 'wb') as key_file:
+            key_file.write(key)
+    elif algorithm == 'RSA':
+        with open(file_name, 'wb') as key_file:
+            key_data = key.save_pkcs1()
+            key_file.write(key_data)
+    print(f"Key saved to {file_name}")
