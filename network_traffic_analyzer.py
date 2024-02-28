@@ -96,3 +96,14 @@ def save_key_to_file(key, algorithm, is_private=True):
             key_data = key.save_pkcs1()
             key_file.write(key_data)
     print(f"Key saved to {file_name}")
+
+def load_key_from_file(file_path, algorithm, is_private=True):
+    with open(file_path, 'rb') as key_file:
+        key_data = key_file.read()
+    if algorithm in ['AES', 'Blowfish', 'Fernet']:
+        return key_data
+    elif algorithm == 'RSA':
+        if is_private:
+            return rsa.PrivateKey.load_pkcs1(key_data)
+        else:
+            return rsa.PublicKey.load_pkcs1(key_data)
