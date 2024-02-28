@@ -50,3 +50,20 @@ def decrypt_file(algorithm, key, input_file_path, output_file_path):
         decrypted_message = decrypt_message(algorithm, key, encrypted_message)
         with open(output_file_path, 'wb') as decrypted_file:
             decrypted_file.write(decrypted_message)
+
+def encrypt_message(algorithm, key, message):
+    if algorithm == 'Fernet':
+        cipher_suite = Fernet(key)
+        encrypted_message = cipher_suite.encrypt(message.encode())
+        return encrypted_message
+    elif algorithm == 'AES':
+        cipher = Cipher(algorithms.AES(key[0]), modes.CFB(key[1]), backend=default_backend())
+        encryptor = cipher.encryptor()
+        return encryptor.update(message.encode()) + encryptor.finalize()
+    elif algorithm == 'Blowfish':
+        cipher = Cipher(algorithms.Blowfish(key[0]), modes.CFB(key[1]), backend=default_backend())
+        encryptor = cipher.encryptor()
+        return encryptor.update(message.encode()) + encryptor.finalize()
+    elif algorithm == 'RSA':
+        encrypted_message = rsa.encrypt(message.encode(), key)
+        return encrypted_message
