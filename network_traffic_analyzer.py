@@ -43,3 +43,10 @@ def encrypt_file(algorithm, key, input_file_path, output_file_path):
         encrypted_message = encrypt_message(algorithm, key, message)
         with open(output_file_path, 'wb') as encrypted_file:
             encrypted_file.write(encrypted_message)
+
+def decrypt_file(algorithm, key, input_file_path, output_file_path):
+    with open(input_file_path, 'rb') as file_to_decrypt:
+        encrypted_message = file_to_decrypt.read()
+        decrypted_message = decrypt_message(algorithm, key, encrypted_message)
+        with open(output_file_path, 'wb') as decrypted_file:
+            decrypted_file.write(decrypted_message)
