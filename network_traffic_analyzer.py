@@ -37,6 +37,63 @@ def generate_key(algorithm):
             key_file.write(key)
         return key
     
+def chat_client(server_ip, server_port, encryption_key, algorithm):
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((server_ip, server_port))
+
+    while True:
+        message = input("Enter message: ")
+        if message == "quit":
+            break
+        encrypted_msg = encrypt_message(algorithm, encryption_key, message)
+        client_socket.send(encrypted_msg)
+
+        if algorithm == 'AES':
+            key = os.urandom(32)  # 256-bit key
+            iv = os.urandom(16)   # AES block size is 128 bits (16 bytes)
+            with open(f'{algorithm}_key.pem', 'wb') as key_file:
+                key_file.write(key)
+            with open(f'{algorithm}_iv.pem', 'wb') as iv_file:
+                iv_file.write(iv)
+            return key, iv
+        
+        elif algorithm == 'Blowfish':
+            key = os.urandom(32)  # Blowfish key can vary; using 256 bits here for simplicity
+            iv = os.urandom(8)    # Blowfish block size is 64 bits (8 bytes)
+            with open(f'{algorithm}_key.pem', 'wb') as key_file:
+                key_file.write(key)
+            with open(f'{algorithm}_iv.pem', 'wb') as iv_file:
+                iv_file.write(iv)
+            return key, iv
+        
+        elif algorithm == 'RSA':
+            private_key = crypto_rsa.generate_private_key(public_exponent=65537, key_size=2048)
+            public_key = private_key.public_key()
+
+            # Save the private key
+            with open(f'{algorithm}_private.pem', 'wb') as priv_key_file:
+                priv_key_file.write(
+                    private_key.private_bytes(
+                        encoding=serialization.Encoding.PEM,
+                        format=serialization.PrivateFormat.PKCS8,
+                        encryption_algorithm=serialization.NoEncryption()
+                    )
+                )
+
+            # Save the public key
+            with open(f'{algorithm}_public.pem', 'wb') as pub_key_file:
+                pub_key_file.write(
+                    public_key.public_bytes(
+                        encoding=serialization.Encoding.PEM,
+                        format=serialization.PublicFormat.SubjectPublicKeyInfo
+                    )
+                )
+
+            return public_key, private_key
+
+        else:
+            raise ValueError("Unsupported algorithm")
+   
 def encrypt_file(algorithm, key, input_file_path, output_file_path):
     with open(input_file_path, 'rb') as file_to_encrypt:
         message = file_to_encrypt.read()
