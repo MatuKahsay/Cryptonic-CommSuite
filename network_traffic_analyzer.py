@@ -67,3 +67,20 @@ def encrypt_message(algorithm, key, message):
     elif algorithm == 'RSA':
         encrypted_message = rsa.encrypt(message.encode(), key)
         return encrypted_message
+    
+def decrypt_message(algorithm, key, encrypted_message):
+    if algorithm == 'Fernet':
+        cipher_suite = Fernet(key)
+        return cipher_suite.decrypt(encrypted_message).decode()
+    elif algorithm == 'AES':
+        cipher = Cipher(algorithms.AES(key[0]), modes.CFB(key[1]), backend=default_backend())
+        decryptor = cipher.decryptor()
+        return decryptor.update(encrypted_message) + decryptor.finalize()
+    elif algorithm == 'Blowfish':
+        cipher = Cipher(algorithms.Blowfish(key[0]), modes.CFB(key[1]), backend=default_backend())
+        decryptor = cipher.decryptor()
+        return decryptor.update(encrypted_message) + decryptor.finalize()
+    elif algorithm == 'RSA':
+        # For RSA, the key should be the private key
+        decrypted_message = rsa.decrypt(encrypted_message, key).decode()
+        return decrypted_message
