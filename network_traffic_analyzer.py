@@ -107,3 +107,24 @@ def load_key_from_file(file_path, algorithm, is_private=True):
             return rsa.PrivateKey.load_pkcs1(key_data)
         else:
             return rsa.PublicKey.load_pkcs1(key_data)
+        
+if __name__ == "__main__":
+    algorithm = input("Enter the encryption algorithm (Fernet, AES, Blowfish, RSA): ")
+    
+    if algorithm not in ['Fernet', 'AES', 'Blowfish', 'RSA']:
+        print("Invalid algorithm selected.")
+    else:
+        key = generate_key(algorithm)
+        operation = input("Choose operation: encrypt or decrypt: ")
+        if operation == "encrypt":
+            input_file_path = input("Enter the input file path: ")
+            output_file_path = input("Enter the output file path: ")
+            encrypt_file(algorithm, key, input_file_path, output_file_path)
+            print(f"File encrypted successfully. Encrypted file is at {output_file_path}")
+        elif operation == "decrypt":
+            input_file_path = input("Enter the encrypted file path: ")
+            output_file_path = input("Enter the output file path: ")
+            decrypt_file(algorithm, key, input_file_path, output_file_path)
+            print(f"File decrypted successfully. Decrypted file is at {output_file_path}")
+        else:
+            print("Invalid operation selected.")
